@@ -1,9 +1,11 @@
 #include "/home/neeljoshi/speaking_clock/include/FreeRTOSv202406.04-LTS/FreeRTOS-LTS/FreeRTOS/FreeRTOS-Kernel/include/FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#include "time_msg.h"
 #include <stdio.h>
 
 SemaphoreHandle_t time_request_sem;
+QueueHandle_t time_queue;
 
 extern void key_task(void *p);
 extern void ntp_task(void *p);
@@ -38,6 +40,7 @@ int main(void) {
     printf("Hardware Initialized. Creating IPC...\n");
 
     time_request_sem = xSemaphoreCreateBinary();
+    time_queue = xQueueCreate(5, sizeof(time_msg));
 
     xTaskCreate(key_task, "KEY", 256, NULL, 1, NULL);
     xTaskCreate(ntp_task, "NTP", 512, NULL, 2, NULL); 
